@@ -72,5 +72,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 =======
 # TaskManagementSystem
 
-Please Run "npm install" after cloning this
->>>>>>> 896d49a64e7c92aadfb672d00b784ecf47b732ad
+
