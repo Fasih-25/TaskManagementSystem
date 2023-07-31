@@ -1,0 +1,85 @@
+import {React, useState} from 'react'
+import { useNavigate } from "react-router-dom";
+
+export default function Login() {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [user, setUser] = useState([])
+    // const [message, setMessage] = useState("");
+    // const [type, setType]=useState('password');
+    // const [icon, setIcon]=useState(eyeOff);
+
+    let navigate = useNavigate();
+
+
+    let handleLogin = async (e) => {
+        console.log(email,password);
+        e.preventDefault();
+        const url = new URL('https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/users');
+        url.searchParams.append('email', email); 
+        url.searchParams.append('password', password); 
+
+        try {
+            fetch(url, {
+                method: 'GET',
+                headers: {'content-type':'application/json'},
+              }).then(res => {
+                if (res.ok) {
+                    
+                    return res.json();
+                }
+                // handle error
+              }).then(tasks => {
+                // mockapi returns only incomplete tasks
+                setUser(tasks[0]);
+                if(tasks.length == 0 ){
+                    alert("User Not Found")
+                }
+                else{
+                localStorage.setItem('user', JSON.stringify(tasks[0]));
+                navigate("/dashboard")
+                }
+              }).catch(error => {
+
+                console.log("ERROR occurs");
+              })
+        } catch (err) {
+          console.log(err);
+        }
+        // 
+      };
+  return (
+    <div className='h-screen font-bold bagckgroundImages text-white flex items-center justify-center'>
+        <div className='backdrop-blur-sm bg-white/30 p-4 flex flex-col justify-center h-fit rounded-lg'>
+            <h1 className='mb-7'> LOGIN </h1>
+            <form onSubmit={handleLogin} className='flex flex-col'>
+                <p className='font-normal text-start mb-2'> Email </p>
+                <input
+                    type="email"
+                    required
+                    placeholder='Email'
+                    name="email"
+                    value={email}
+                    onChange={(e)=>setEmail(e.target.value)}
+                    className="mb-6 bg-slate-800 block w-full px-2 xl:!py-3 py-2 mt-1 border-slate-900  rounded-md shadow-sm focus:border-slate-400-300 focus:ring focus:ring-slate-200 focus:ring-opacity-50"
+                />
+                <p className='font-normal text-start mb-2'> password </p>
+                <input
+                    type='password'
+                    required
+                    placeholder='Password'
+                    name="password"
+                    value={password}
+                    onChange={(e)=>setPassword(e.target.value)}
+                    className="mb-4 bg-slate-800 block w-full px-2 xl:!py-3 py-2 mt-1 border-slate-900  rounded-md shadow-sm focus:border-slate-400-300 focus:ring focus:ring-slate-200 focus:ring-opacity-50"
+                />
+                <div className="flex items-center mt-4">
+                    <button type='submit' className="mb-4 w-full px-4 py-3 xxsm:mx-16 xsm:mx-24   tracking-wide text-white transition-colors duration-200 transform bg-blue-900 shadowBox  rounded-md focus:outline-none">
+                        LOG IN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+  )
+}
