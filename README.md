@@ -1,6 +1,6 @@
 INSTRUCTION FOR USAGE:
 
-1 => Please Run `npm install` after cloning.
+1 => Please Run `npm install` OR `yarn install` after cloning.
 
 2 => It will have 2 kind of users 
     (i) = > Front-end developers.
