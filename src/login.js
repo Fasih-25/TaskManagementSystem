@@ -2,6 +2,8 @@ import {React, useState} from 'react'
 import { useNavigate } from "react-router-dom";
 import {  useDispatch } from 'react-redux';
 import store from "./store.js";
+import { toast } from 'react-toastify';
+
 
 export default function Login() {
     const [email, setEmail] = useState("")
@@ -38,16 +40,23 @@ export default function Login() {
                 }
               }).then(user => {
                 if(user.length === 0 ){
-                    alert("User Not Found")
+                  toast.error('User Not Found', {
+                    position: 'bottom-right',
+                    autoClose: 3000,
+                  });
                 }
                 else{
+
                   dispatch({ type: "removeFromArray", item: user[0] });
                   dispatch({ type: "addToArray", item: user[0] });
                   navigate("/dashboard");
                 }
               }).catch(error => {
 
-                console.log("ERROR occurs");
+                toast.error('Something wen wrong', {
+                    position: 'bottom-right',
+                    autoClose: 3000,
+                  });
               })
         } catch (err) {
           console.log(err);

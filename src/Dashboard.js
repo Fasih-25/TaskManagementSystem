@@ -51,7 +51,7 @@ export default function Dashboard() {
   function handleLogout() {
     dispatch({ type: "removeFromArray", item: user[0] });
     toast.success('Logged out successfully!', {
-      position: 'top-right',
+      position: 'bottom-right',
       autoClose: 3000,
     });
     navigate("/");
