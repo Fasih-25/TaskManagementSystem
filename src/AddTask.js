@@ -5,14 +5,14 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function AddTask({trigger, onClose}) {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
-    const [groudId, setGroupId] = useState("")
+    const [groupId, setGroupId] = useState("")
     const [completed, setCompleted] = useState(false)
     let navigate = useNavigate();
 
     const newTask={ 
         title: title,
         description: description,
-        GroudId: groudId,
+        group: groupId,
         completed: completed
     }
 
@@ -74,7 +74,7 @@ export default function AddTask({trigger, onClose}) {
                             </div>
                             <div className='flex flex-col mt-3'>
                                 <label className='text-start text-black mb-2'>Group Name</label>
-                                <input type='text' name='tiltle' placeholder='Group Name' value={groudId}
+                                <input type='text' name='tiltle' placeholder='Group Name' value={groupId}
                                 onChange={(e)=>setGroupId(e.target.value)} className="mb-6 bg-slate-800 block w-full px-2 xl:!py-3 py-2 mt-1 border-slate-900  rounded-md shadow-sm focus:border-slate-400-300 focus:ring focus:ring-slate-200 focus:ring-opacity-50" required />
                             </div>
 

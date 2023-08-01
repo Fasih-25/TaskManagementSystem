@@ -1,124 +1,198 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AddTask from "./AddTask";
-
+import { useSelector, useDispatch } from "react-redux";
 
 export default function Dashboard() {
-    const [buttonPopup, setButtonPopup] = useState(false);
-    const handleOnClose = () => setButtonPopup(false);
-    const [tasks, setTasks] = useState([]);
-    const location = useLocation();
-    const data = location.state;
-    
-    useEffect(() => {
-        const fetchData = async () => {
-            fetch('https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks', {
-                method: 'GET',
-                headers: {'content-type':'application/json'},
-              }).then(res => {
-                if (res.ok) {
-                    return res.json();
-                }
-                // handle error
-              }).then(tasks => {
-                // Do something with the list of tasks
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                setTasks(tasks);
-                console.log(tasks);
-              }).catch(error => {
-                alert("error occurs");
-              })
-        };
-      
-        fetchData();
-      }, [data]);
+  const user = useSelector((state) => state.user);;
+  const [buttonPopup, setButtonPopup] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [deleted, setDeleted] = useState();
+  const handleOnClose = () => setButtonPopup(false);
+ 
 
-    
-      async function handleChangeStatus(taskId) {
-        fetch(`https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks/${taskId}`, {
-          method: 'PUT',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ completed: true })
+  let navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
+  
+  const data = location.state;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      fetch("https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks", {
+        method: "GET",
+        headers: { "content-type": "application/json" },
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          }
+          // handle error
         })
-          .then(res => {
-            if (res.ok) {
-              return res.json();
-            }
-            // handle error
-            throw new Error('Failed to update task status');
-          })
-          .then(updatedTask => {
-            alert("TASK STATUS UPDATED"); 
+        .then((tasks) => {
+          const typeSpecifictasks = tasks.filter((tasks) => tasks.group == user[0].group);
+          dispatch({ type: "removeFromtask" });
+          dispatch({ type: "addTotask", item: typeSpecifictasks });
+          setTasks(typeSpecifictasks);
 
-            setTasks(prevTasks =>
-              prevTasks.map(task => (task.id === updatedTask.id ? updatedTask : task))
-            );
-          })
-          .catch(error => {
-            alert("error occurs");
-          });
+        })
+        .catch((error) => {
+          alert("error occurs");
+        });
+    };
+  
+    fetchData();
+ 
+  }, [data,deleted]);
+
+  function handleLogout() {
+    dispatch({ type: "removeFromArray", item: user[0] });
+    navigate("/");
+  }
+
+  async function handleDelete(taskId) {
+    fetch(
+      `https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks/${taskId}`,
+      {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
       }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        // handle error
+        throw new Error("Failed to Delete task");
+      })
+      .then((updatedTask) => {
+        alert("TASK DELETED");
+        setDeleted((variable) => variable + 1);
+      })
+      .catch((error) => {
+        alert("error occurs");
+      });
+  }
+  async function handleChangeStatus(taskId) {
+    fetch(
+      `https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks/${taskId}`,
+      {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ completed: true }),
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        // handle error
+        throw new Error("Failed to update task status");
+      })
+      .then((updatedTask) => {
+        alert("TASK STATUS UPDATED");
 
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === updatedTask.id ? updatedTask : task
+          )
+        );
+      })
+      .catch((error) => {
+        alert("error occurs");
+      });
+  }
 
-    const onDragEnd = (result) => {
+  const onDragEnd = (result) => {
     if (!result.destination) return;
-   
+
     const items = Array.from(tasks);
     const [reorderedItem] = items.splice(result.source.index, 1);
-       items.splice(result.destination.index, 0, reorderedItem);
-        
-       setTasks(items);
-       
-     };
-     useEffect(() => {
-        const storedTasks = localStorage.getItem('tasks');
-        if (storedTasks) {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-      }, [tasks]);
+    items.splice(result.destination.index, 0, reorderedItem);
 
-     
-   return(
-    <div className='h-screen font-bold bgImage text-white flex flex-col justify-center p-4 items-center overflow-scroll'>
-        <div className='w-11/12 h-fit p-2 backdrop-blur-sm bg-white/30 m-3 rounded-md flex justify-around mt-4 ' >
-            <div>
-                <button className='bg-teal-600 p-3 rounded-xl' onClick={() => setButtonPopup(true)}>Add Task</button>
-            </div>
+    setTasks(items);
+  };
+  useEffect(() => {
+    dispatch({ type: "removeFromtask" });
+    dispatch({ type: "addTotask", item: tasks });
+  }, [tasks]);
+
+  return (
+    <div className="h-screen font-bold bgImage text-white flex flex-col justify-center p-4 items-center overflow-scroll">
+      <div className="w-11/12 h-fit p-2 backdrop-blur-sm bg-white/25 m-3 rounded-md flex justify-between mt-4 ">
+        <div className=" rounded-lg flex justify-center items-center">
+            <p className="p-2 text-cyan-400">{user[0].name}</p>
         </div>
-        <div className="flex justify-center h-5/6">
-            <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="tasks">
+        <div>
+          <button
+            className="bg-teal-600 p-3 rounded-xl mx-1 shadow-slate-700"
+            onClick={() => setButtonPopup(true)}
+          >
+            Add Task
+          </button>
+          <button
+            className="bg-red-600 p-3 rounded-xl mx-1"
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
+        </div>
+      </div>
+      <div className="flex justify-center h-5/6">
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="tasks">
             {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className="flex flex-col justify-start ">
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="flex flex-col justify-start "
+              >
                 {tasks.map((task, index) => (
-                    <Draggable
+                  <Draggable
                     key={task.id}
                     draggableId={task.id.toString()}
                     index={index}
-                    >
+                  >
                     {(provided) => (
-                        <div
+                      <div
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
-                        >
-                            <div className="flex flex-col mx-3 my-2 backdrop-blur-sm bg-white/30 w-72 h-fit p-3 rounded-xl  "> 
-                                <h1 className="text-teal-400  font-bold text-start"> {task.title} </h1>
-                                <p className="  font-normal "> {task.description} </p> 
-                                <div className="flex justify-end mt-2">
-                                        <button className="bg-green-800 px-4 py-2 rounded-lg font-semibold " onClick={() => handleChangeStatus(task.id)}>Done</button>
-                                </div>
-                            </div>
+                      >
+                        <div className="flex flex-col mx-3 my-2 backdrop-blur-sm bg-white/20 w-96 h-fit p-3 rounded-xl  ">
+                          <h1 className="text-teal-50-400  font-bold text-start">
+                            {" "}
+                            {task.title}{" "}
+                          </h1>
+                          <p className="  font-normal"> {task.description} </p>
+                          <div className="flex justify-end mt-2">
+                          {task.completed === false ? (
+                              <button
+                                className="bg-purple-900 px-2 py-2 rounded-lg font-semibold "
+                                onClick={() => handleChangeStatus(task.id)}
+                              >
+                                Incomplete
+                              </button>
+                            ) : (
+                              <button className="bg-green-800 px-2 py-2 rounded-lg font-semibold mx-1" disabled>
+                                Completed
+                              </button>
+                            )}
+                            <button className="bg-red-800 px-4 py-2 rounded-lg font-semibold mx-1" onClick={() => handleDelete(task.id)}>
+                                Delete
+                              </button>
+                          </div>
                         </div>
+                      </div>
                     )}
-                    </Draggable>
+                  </Draggable>
                 ))}
                 {provided.placeholder}
-                </div>
+              </div>
             )}
-            </Droppable>
+          </Droppable>
         </DragDropContext>
       </div>
       <AddTask trigger={buttonPopup} onClose={handleOnClose}>
@@ -126,7 +200,5 @@ export default function Dashboard() {
         <p>this is popup</p>
       </AddTask>
     </div>
-   )
+  );
 }
-
-

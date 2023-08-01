@@ -5,6 +5,12 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+if you are running after clonning, Please run:
+
+### `npm install `
+
+and then.
+
 In the project directory, you can run:
 
 ### `npm start`

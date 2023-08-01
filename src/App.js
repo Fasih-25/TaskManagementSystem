@@ -1,21 +1,22 @@
 import './App.css';
 import React from 'react';
 import './index.css';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import Login from './login';
 import Dashboard from './Dashboard';
+import PrivateRoute from './PrivateRoute';
 
 function App() {
+
   return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route exact path="/" element={<Login />} />
-          <Route exact path="/dashboard" element={<Dashboard />} />
-          
-        </Routes>
-      </Router>
-    </div>
+     <HashRouter>
+       <Routes>
+         <Route  path="/" name="Login Page" element={<Login />} />
+         <Route  exact path="/dashboard" name="Dashboard"  element={ <PrivateRoute/>}>
+             <Route  path="/dashboard" name="Dashboard"  element={<Dashboard />} />
+         </Route>
+       </Routes>
+   </HashRouter>
   );
 }
 
