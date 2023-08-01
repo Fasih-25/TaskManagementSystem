@@ -1,6 +1,6 @@
 import {React, useState,useEffect} from 'react'
 import { Link, useNavigate } from 'react-router-dom';
-
+import { toast } from 'react-toastify';
 
 export default function AddTask({trigger, onClose}) {
     const [title, setTitle] = useState("")
@@ -41,14 +41,21 @@ export default function AddTask({trigger, onClose}) {
             }
             // handle error
             }).then(task => {
-                alert("Task added successfully");
+                // alert("Task added successfully");
+                toast.success('Task added successfully', {
+                    position: 'bottom-right',
+                    autoClose: 3000,
+                  });
                 setTitle("");
                 setDescription("");
                 setGroupId("");
                 navigate("/dashboard",{state:newTask})
                 onClose();
             }).catch(error => {
-            alert("error occurs");
+                toast.error('Something went wrong', {
+                    position: 'bottom-right',
+                    autoClose: 3000,
+                  });
             })
       }
   return (trigger) ? (

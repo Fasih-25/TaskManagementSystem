@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useLocation } from "react-router-dom";
 import AddTask from "./AddTask";
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from 'react-toastify';
 
 export default function Dashboard() {
   const user = useSelector((state) => state.user);;
@@ -49,6 +50,10 @@ export default function Dashboard() {
 
   function handleLogout() {
     dispatch({ type: "removeFromArray", item: user[0] });
+    toast.success('Logged out successfully!', {
+      position: 'top-right',
+      autoClose: 3000,
+    });
     navigate("/");
   }
 
@@ -64,17 +69,25 @@ export default function Dashboard() {
         if (res.ok) {
           return res.json();
         }
-        // handle error
+         toast.error('Task Not Deleted!', {
+          position: 'bottom-right',
+          autoClose: 3000,
+        });
         throw new Error("Failed to Delete task");
+       
       })
       .then((updatedTask) => {
-        alert("TASK DELETED");
+        toast.success('Task Deleted successfully!', {
+          position: 'bottom-right',
+          autoClose: 3000,
+        });
         setDeleted((variable) => variable + 1);
       })
       .catch((error) => {
         alert("error occurs");
       });
   }
+
   async function handleChangeStatus(taskId) {
     fetch(
       `https://64c64bad0a25021fde917f0f.mockapi.io/api/tasks/tasks/${taskId}`,
@@ -88,11 +101,17 @@ export default function Dashboard() {
         if (res.ok) {
           return res.json();
         }
-        // handle error
+        toast.error('Task Not Completed', {
+          position: 'bottom-right',
+          autoClose: 3000,
+        });
         throw new Error("Failed to update task status");
       })
       .then((updatedTask) => {
-        alert("TASK STATUS UPDATED");
+        toast.success('Task Completed', {
+          position: 'bottom-right',
+          autoClose: 3000,
+        });
 
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
@@ -113,7 +132,12 @@ export default function Dashboard() {
     items.splice(result.destination.index, 0, reorderedItem);
 
     setTasks(items);
+    toast.success('Task moved', {
+      position: 'bottom-right',
+      autoClose: 3000,
+    });
   };
+
   useEffect(() => {
     dispatch({ type: "removeFromtask" });
     dispatch({ type: "addTotask", item: tasks });

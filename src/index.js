@@ -7,11 +7,17 @@ import { Provider } from 'react-redux'; // Import the Provider component
 import store from './store'; // Import your store.js file
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 createRoot(document.getElementById('root')).render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <>
+    <Provider store={store}>
+      <App />
+      
+    </Provider>,
+    <ToastContainer />
+  </>
 )
 
 // If you want to start measuring performance in your app, pass a function
